@@ -1,1 +1,1 @@
-# feature-cryptography
+#[ModKit Wiki](../../wiki)

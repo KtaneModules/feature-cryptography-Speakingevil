@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: featureCryptography
+  title: Feature Cryptography
+  author: Speakingevil
+  description: "/ju/ /\u03B8\u0254t/ /f\u0259\u028An\u025Bt\u026Ak/ /sp\u025Bl\u026A\u014B/
+    /w\u0252z/ /s\u0259p\u0259\u028Azd/ /tu/ /bi/ /iz\u026A\u0259/ /tu/ /rid/? /ju/
+    /\u03B8\u0254t/ /r\u0252\u014B/.\n\nDecrypt the excerpt of text shown in featural
+    phonetic glyphs and enter the missing word by combining features."
+  version: 1.0
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: 606dadc4eb44bc14b921071d65af0987, type: 3}
