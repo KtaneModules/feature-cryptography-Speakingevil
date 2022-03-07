@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -215,8 +215,7 @@ public class FeatureCryptographyScript : MonoBehaviour {
                                     StartCoroutine(Scrolve());
                                 }
                                 else
-                                    module.HandleStrike();
-                                 
+                                    module.HandleStrike();                                
                             }
                             break;
                         default:
@@ -273,6 +272,146 @@ public class FeatureCryptographyScript : MonoBehaviour {
             displays[3].color = new Color(0, 0.1f * i, 0);
             yield return new WaitForSeconds(0.05f);
         }
+    }
 
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = "!{0} cycle l/m/r [Cycles through all features on a rotor] | !{0} up/down l/m/r # [Turns a rotor the specified number of times] | !{0} add [Enters glyph] | !{0} back [Removes last glyph] | !{0} cancel [Removes all glyphs] | !{0} submit";
+#pragma warning restore 414
+
+    private IEnumerator ProcessTwitchCommand(string command)
+    {
+        yield return null;
+        string[] commands = command.ToUpperInvariant().Split(' ');
+        switch (commands[0])
+        {
+            case "CYCLE":
+                if(commands.Length != 2)
+                {
+                    yield return "sendtochaterror!f Invalid command length.";
+                    yield break;
+                }
+                int r = new List<string> { "LEFT", "MIDDLE", "RIGHT", "L", "M", "R" }.IndexOf(commands[1]) % 3;
+                if(r < 0)
+                {
+                    yield return "sendtochaterror!f \"" + commands[1] + "\" is an invalid command.";
+                    yield break;
+                }
+                for(int i = 0; i < rotarrange[r].Count(); i++)
+                {
+                    while (turn[r])
+                        yield return null;
+                    yield return new WaitForSeconds(1);
+                    buttons[2 * r].OnInteract();
+                }
+                yield break;
+            case "UP":
+            case "DOWN":
+                if (commands.Length != 3)
+                {
+                    yield return "sendtochaterror!f Invalid command length.";
+                    yield break;
+                }
+                int u = new List<string> { "LEFT", "MIDDLE", "RIGHT", "L", "M", "R" }.IndexOf(commands[1]) % 3;
+                if (u < 0)
+                {
+                    yield return "sendtochaterror!f \"" + commands[1] + "\" is an invalid command.";
+                    yield break;
+                }
+                int o = 0;
+                if (int.TryParse(commands[2], out o))
+                {
+                    if(o >= rotarrange[u].Count())
+                    {
+                        yield return "sendtochaterror!f " + string.Format("The {0} rotor has only {1} options. Enter a number smaller than {1}.", new string[] { "left", "middle", "right"}[u], rotarrange[u].Count());
+                        yield break;
+                    }
+                    int d = commands[0] == "UP" ? 0 : 1;
+                    for (int i = 0; i < o; i++)
+                    {
+                        while (turn[u])
+                            yield return null;
+                        yield return null;
+                        buttons[(2 * u) + d].OnInteract();
+                    }
+                }
+                else
+                    yield return "sendtchaterror!f \"" + commands[2] + "\" is not a number.";
+                yield break;
+            case "ADD":
+                if (commands.Length > 1)
+                {
+                    yield return "sendtochaterror!f Invalid command length.";
+                    yield break;
+                }
+                if(entry[1].Count() > 7)
+                {
+                    yield return "sendtochaterror!f Entry cannot have more than 8 glyphs.";
+                    yield break;
+                }
+                buttons[7].OnInteract();
+                yield break;
+            case "BACK":
+            case "CANCEL":
+                if (commands.Length > 1)
+                {
+                    yield return "sendtochaterror!f Invalid command length.";
+                    yield break;
+                }
+                if (entry[1].Count() < 1)
+                {
+                    yield return "sendtochaterror!f Entry is already empty.";
+                    yield break;
+                }
+                int rep = commands[0] == "BACK" ? 1 : entry[1].Count();
+                for(int i = 0; i < rep; i++)
+                {
+                    yield return null;
+                    buttons[6].OnInteract();
+                }
+                yield break;
+            case "SUBMIT":
+                if (commands.Length > 1)
+                {
+                    yield return "sendtochaterror!f Invalid command length.";
+                    yield break;
+                }
+                if (entry[1].Count() < 3)
+                {
+                    yield return "sendtochaterror!f Submission must have at least 3 glyphs.";
+                    yield break;
+                }
+                buttons[8].OnInteract();
+                yield break;
+            default:
+                yield return "sendtochaterror!f \"" + commands[0] + "\" is an invalid command.";
+                yield break;
+        }
+    }
+
+    private IEnumerator TwitchHandleForcedSolve()
+    {
+        while(entry[1].Count() > 0)
+        {
+            yield return null;
+            buttons[6].OnInteract();
+        }
+        for(int i = 0; i < entry[0].Count(); i++)
+        {
+            string[] f = entry[0][i].Select((x, k) => featarrange[k][x]).ToArray();
+            for(int j = 0; j < 3; j++)
+            {
+                while (rotarrange[j][selected[j]] != f[j])
+                {
+                    yield return null;
+                    buttons[2 * j].OnInteract();
+                    while (turn[j])
+                        yield return null;
+                }
+            }
+            yield return null;
+            buttons[7].OnInteract();
+        }
+        yield return null;
+        buttons[8].OnInteract();
     }
 }
